@@ -7,7 +7,7 @@ function App() {
   });
 
   const logEffectInit = () => {
-    console.log('Use Effect!');
+    console.log('Functional-Light JavaScript by Kyle Simpson loaded!');
   };
   return (
     <>
