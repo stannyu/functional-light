@@ -1,8 +1,8 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from 'react';
 
 function App(props) {
   useEffect(() => {
-    console.log("Use Effect!");
+    console.log('Use Effect initiated');
   });
   return <div>Hi there</div>;
 }
