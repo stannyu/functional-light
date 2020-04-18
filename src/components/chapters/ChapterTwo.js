@@ -1,9 +1,22 @@
 import React, { useEffect } from 'react';
 
-function ChapterTwo(props) {
+function ChapterTwo() {
   useEffect(() => {
-    console.log('chapter 2 loaded');
+    initChapterTwoCalculations();
   });
+
+  function initChapterTwoCalculations() {
+    console.log('chapter 2 loaded');
+  }
+
+  function checkArity() {
+    /**
+     * Function arity can be checked by [[length]] function property
+     * it will show how many parameters this function have
+     */
+    const foo = (x, y, z) => {};
+    foo.length; // 3 as there are 3 parameters
+  }
 
   return <h2>Chapter 2: The Nature Of Functions</h2>;
 }
