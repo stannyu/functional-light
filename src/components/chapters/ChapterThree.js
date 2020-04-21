@@ -11,6 +11,7 @@ function ChapterThree() {
     oneOnOne();
     unchangingOne();
     adaptingFunctions2Parameters();
+    someNowSomeLater();
   }
 
   function allForOne() {
@@ -89,6 +90,39 @@ function ChapterThree() {
       return v1 + v2;
     }
     [1, 2, 3, 4, 5].reduce(gatherArgs(combineFirstTwo)); //15
+  }
+
+  function someNowSomeLater() {
+    var partial = (fn, ...presetArgs) => (...laterArgs) => fn(...presetArgs, ...laterArgs);
+
+    const add = (x, y) => x + y;
+
+    [1, 2, 3, 4, 5].map(function adder(val) {
+      return add(3, val);
+    }); // [4,5,6,7,8]
+
+    [1, 2, 3, 4, 5].map(partial(add, 3)); // [4,5,6,7,8]
+
+    /**
+     * Reversing Arguments
+     */
+
+    const reverseArgs = fn => (...args) => fn(...args.reverse());
+    const partialRight = (fn, ...presetArgs) => (...laterArgs) => fn(...laterArgs, ...presetArgs);
+
+    function foo(x, y, z, ...rest) {
+      console.log(x, y, z, rest);
+    }
+
+    const f = partialRight(foo, 'z:last');
+
+    f(1, 2); // 1 2 "z:last" []
+
+    f(1); // 1 "z:last" undefined []
+
+    f(1, 2, 3); // 1 2 3 ["z:last"]
+
+    f(1, 2, 3, 4); // 1 2 3 [4,"z:last"]
   }
 
   return <h2>Chapter 3: Managing Function Inputs</h2>;
