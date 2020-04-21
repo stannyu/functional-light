@@ -125,6 +125,58 @@ function ChapterThree() {
     f(1, 2, 3, 4); // 1 2 3 [4,"z:last"]
   }
 
+  function oneAtATime() {
+    // functioanl way
+    function curryFunc(fn, arity = fn.length) {
+      return (function nextCurried(prevArgs) {
+        return function curried(nextArg) {
+          const args = [...prevArgs, nextArg];
+
+          if (args.length >= arity) {
+            return fn(...args);
+          } else {
+            return nextCurried(args);
+          }
+        };
+      })([]);
+    }
+
+    // or the ES6 => arrow form
+    const curry = (fn, arity = fn.length, nextCurried) =>
+      (nextCurried = prevArgs => nextArg => {
+        const args = [...prevArgs, nextArg];
+
+        if (args.length >= arity) {
+          return fn(...args);
+        } else {
+          return nextCurried(args);
+        }
+      })([]);
+
+    const add = (x, y) => x + y;
+    [1, 2, 3, 4, 5].map(curry(add)(3)); // [4,5,6,7,8]
+
+    const adder = curry(add);
+    // later
+    [1, 2, 3, 4, 5].map(adder(3)); // [4,5,6,7,8]
+
+    function sum(...nums) {
+      let total = 0;
+      for (let num of nums) {
+        total += num;
+      }
+      return total;
+    }
+
+    sum(1, 2, 3, 4, 5); // 15
+
+    // now with currying:
+    // (5 to indicate how many we should wait for)
+    const curriedSum = curry(sum, 5);
+
+    curriedSum(1)(2)(3)(4)(5); // 15
+  }
+
   return <h2>Chapter 3: Managing Function Inputs</h2>;
 }
 
