@@ -11,6 +11,7 @@ function ChapterThree() {
     oneOnOne();
     unchangingOne();
     adaptingFunctions2Parameters();
+    someNowSomeLater();
   }
 
   function allForOne() {
@@ -89,6 +90,91 @@ function ChapterThree() {
       return v1 + v2;
     }
     [1, 2, 3, 4, 5].reduce(gatherArgs(combineFirstTwo)); //15
+  }
+
+  function someNowSomeLater() {
+    var partial = (fn, ...presetArgs) => (...laterArgs) => fn(...presetArgs, ...laterArgs);
+
+    const add = (x, y) => x + y;
+
+    [1, 2, 3, 4, 5].map(function adder(val) {
+      return add(3, val);
+    }); // [4,5,6,7,8]
+
+    [1, 2, 3, 4, 5].map(partial(add, 3)); // [4,5,6,7,8]
+
+    /**
+     * Reversing Arguments
+     */
+
+    const reverseArgs = fn => (...args) => fn(...args.reverse());
+    const partialRight = (fn, ...presetArgs) => (...laterArgs) => fn(...laterArgs, ...presetArgs);
+
+    function foo(x, y, z, ...rest) {
+      console.log(x, y, z, rest);
+    }
+
+    const f = partialRight(foo, 'z:last');
+
+    f(1, 2); // 1 2 "z:last" []
+
+    f(1); // 1 "z:last" undefined []
+
+    f(1, 2, 3); // 1 2 3 ["z:last"]
+
+    f(1, 2, 3, 4); // 1 2 3 [4,"z:last"]
+  }
+
+  function oneAtATime() {
+    // functioanl way
+    function curryFunc(fn, arity = fn.length) {
+      return (function nextCurried(prevArgs) {
+        return function curried(nextArg) {
+          const args = [...prevArgs, nextArg];
+
+          if (args.length >= arity) {
+            return fn(...args);
+          } else {
+            return nextCurried(args);
+          }
+        };
+      })([]);
+    }
+
+    // or the ES6 => arrow form
+    const curry = (fn, arity = fn.length, nextCurried) =>
+      (nextCurried = prevArgs => nextArg => {
+        const args = [...prevArgs, nextArg];
+
+        if (args.length >= arity) {
+          return fn(...args);
+        } else {
+          return nextCurried(args);
+        }
+      })([]);
+
+    const add = (x, y) => x + y;
+    [1, 2, 3, 4, 5].map(curry(add)(3)); // [4,5,6,7,8]
+
+    const adder = curry(add);
+    // later
+    [1, 2, 3, 4, 5].map(adder(3)); // [4,5,6,7,8]
+
+    function sum(...nums) {
+      let total = 0;
+      for (let num of nums) {
+        total += num;
+      }
+      return total;
+    }
+
+    sum(1, 2, 3, 4, 5); // 15
+
+    // now with currying:
+    // (5 to indicate how many we should wait for)
+    const curriedSum = curry(sum, 5);
+
+    curriedSum(1)(2)(3)(4)(5); // 15
   }
 
   return <h2>Chapter 3: Managing Function Inputs</h2>;
