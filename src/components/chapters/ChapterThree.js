@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { concat } from 'lodash';
 
 function ChapterThree() {
   useEffect(() => {
@@ -12,6 +13,9 @@ function ChapterThree() {
     unchangingOne();
     adaptingFunctions2Parameters();
     someNowSomeLater();
+    oneAtATime();
+    noCurryPlease();
+    orderMatters();
   }
 
   function allForOne() {
@@ -175,6 +179,123 @@ function ChapterThree() {
     const curriedSum = curry(sum, 5);
 
     curriedSum(1)(2)(3)(4)(5); // 15
+
+    /**
+     *  Loose curry function that allow to apply several arguments at a time
+     * @param fn
+     * @param arity
+     * @returns {curried}
+     */
+
+    function looseCurry(fn, arity = fn.length) {
+      return (function nextCurried(prevArgs) {
+        return function curried(...nextArgs) {
+          const args = [...prevArgs, ...nextArgs];
+
+          if (args.length >= arity) {
+            return fn(...args);
+          } else {
+            return nextCurried(args);
+          }
+        };
+      })([]);
+    }
+
+    const looseCurryArrowFn = (fn, arity = fn.length, nextCurried) =>
+      (nextCurried = prevArgs => (...nextArg) => {
+        const args = [...prevArgs, ...nextArg];
+
+        if (args.length >= arity) {
+          return fn(...args);
+        } else {
+          return nextCurried(args);
+        }
+      })([]);
+
+    const loosedCurriedSum = looseCurry(sum, 5);
+    const loosedCurriedSumArr = looseCurryArrowFn(sum, 5);
+
+    console.log(loosedCurriedSum(1)(2, 3)(4, 5)); // 15
+    console.log(loosedCurriedSumArr(1)(2, 3)(4, 5)); // 15
+  }
+
+  function noCurryPlease() {
+    function uncurryFunc(fn) {
+      return function uncurried(...args) {
+        let ret = fn;
+
+        for (let arg of args) {
+          ret = ret(arg);
+        }
+
+        return ret;
+      };
+    }
+
+    // or the ES6 => arrow form
+    const uncurry = fn => (...args) => {
+      let ret = fn;
+
+      for (let arg of args) {
+        ret = ret(arg);
+      }
+
+      return ret;
+    };
+
+    function sum(...nums) {
+      let sum = 0;
+      for (let num of nums) {
+        sum += num;
+      }
+      return sum;
+    }
+
+    const curry = (fn, arity = fn.length, nextCurried) =>
+      (nextCurried = prevArgs => nextArg => {
+        const args = [...prevArgs, nextArg];
+
+        if (args.length >= arity) {
+          return fn(...args);
+        } else {
+          return nextCurried(args);
+        }
+      })([]);
+
+    const curriedSum = curry(sum, 5);
+    const uncurriedSum = uncurry(curriedSum);
+
+    curriedSum(1)(2)(3)(4)(5); // 15
+
+    uncurriedSum(1, 2, 3, 4, 5); // 15
+    uncurriedSum(1, 2, 3)(4)(5); // 15
+  }
+
+  function orderMatters() {
+    const partialProps = (fn, presentArgs) => laterArgs => fn(Object.assign({}, presentArgs, laterArgs));
+
+    const foo3Params = ({ x, y, z } = {}) => console.log('x:', x, 'y:', y, 'z: ', z);
+    const getTwoParams = partialProps(foo3Params, { x: 1, z: 2 });
+    getTwoParams({ y: 3 }); // x: 1 y: 3 z:  2
+
+    function curryProps(fn, arity = 1) {
+      return (function nextCurried(prevArgsObj) {
+        return function curried(nextArgObj = {}) {
+          let [key] = Object.keys(nextArgObj);
+          let allArgsObj = Object.assign({}, prevArgsObj, { [key]: nextArgObj[key] });
+
+          if (Object.keys(allArgsObj).length >= arity) {
+            return fn(allArgsObj);
+          } else {
+            return nextCurried(allArgsObj);
+          }
+        };
+      })({});
+    }
+
+    const f1 = curryProps( foo3Params, 3 );
+
+    f1( {y: 2} )( {x: 1} )( {z: 3} ); // x:1 y:2 z:3
   }
 
   return <h2>Chapter 3: Managing Function Inputs</h2>;
