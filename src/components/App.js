@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import ChapterTwo from './chapters/ChapterTwo';
 import ChapterThree from './chapters/ChapterThree';
+import ChapterFour from './chapters/ChapterFour';
 
 function App() {
   useEffect(() => {
@@ -15,6 +16,7 @@ function App() {
       <h1>Hi there</h1>
       <ChapterTwo />
       <ChapterThree />
+      <ChapterFour />
     </>
   );
 }

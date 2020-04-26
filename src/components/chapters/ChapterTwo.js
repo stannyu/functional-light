@@ -6,7 +6,7 @@ function ChapterTwo() {
   });
 
   function initChapterTwoCalculations() {
-    console.log('chapter 2 loaded');
+    console.log('Chapter 2: The Nature Of Functions');
   }
 
   function checkArity() {

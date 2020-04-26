@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { concat } from 'lodash';
 
 function ChapterThree() {
   useEffect(() => {
@@ -7,15 +6,16 @@ function ChapterThree() {
   });
 
   function initChapterThreeCalculations() {
-    console.log('Chapter 3 mounted');
-    allForOne();
-    oneOnOne();
-    unchangingOne();
-    adaptingFunctions2Parameters();
-    someNowSomeLater();
-    oneAtATime();
-    noCurryPlease();
-    orderMatters();
+    console.log('Chapter 3: Managing Function Inputs');
+    // allForOne();
+    // oneOnOne();
+    // unchangingOne();
+    // adaptingFunctions2Parameters();
+    // someNowSomeLater();
+    // oneAtATime();
+    // noCurryPlease();
+    // orderMatters();
+    // pointFreeNotation();
   }
 
   function allForOne() {
@@ -49,8 +49,8 @@ function ChapterThree() {
 
     const upper = txt => txt.toUpperCase();
 
-    output('Hello', upper);
-    output('Hello');
+    output('Hello', upper); // HELLO
+    output('Hello'); // Hello
   }
 
   function unchangingOne() {
@@ -97,7 +97,7 @@ function ChapterThree() {
   }
 
   function someNowSomeLater() {
-    var partial = (fn, ...presetArgs) => (...laterArgs) => fn(...presetArgs, ...laterArgs);
+    const partial = (fn, ...presetArgs) => (...laterArgs) => fn(...presetArgs, ...laterArgs);
 
     const add = (x, y) => x + y;
 
@@ -293,9 +293,57 @@ function ChapterThree() {
       })({});
     }
 
-    const f1 = curryProps( foo3Params, 3 );
+    const f1 = curryProps(foo3Params, 3);
 
-    f1( {y: 2} )( {x: 1} )( {z: 3} ); // x:1 y:2 z:3
+    f1({ y: 2 })({ x: 1 })({ z: 3 }); // x:1 y:2 z:3
+  }
+
+  function pointFreeNotation() {
+    const output = msg => console.log(msg);
+    const printIf = (predicate, msg) => {
+      if (predicate(msg)) {
+        output(msg);
+      }
+    };
+    const isShortEnough = str => str.length <= 5;
+    printIf(isShortEnough, 'Hello'); // Hello
+    printIf(isShortEnough, 'Hello World'); // nothing
+
+    /**
+     * NOT!!!
+     * @param predicate: function that return condition check result
+     * @returns {function(...[*]): boolean}: converted predicate value
+     */
+    const not = predicate => (...args) => !predicate(...args);
+    const isLongEnough = not(isShortEnough);
+
+    printIf(isLongEnough, 'Hello'); // nothing
+    printIf(isLongEnough, 'Hello World!'); // Hello World!
+
+
+    const when = (predicate, fn) => (...args) => predicate(...args) ? fn(...args) : undefined;
+
+    const partialRight = (fn, ...presetArgs) => (...laterArgs) => fn(...laterArgs, ...presetArgs);
+    const uncurry = fn => (...args) => {
+      let ret = fn;
+
+      for (let arg of args) {
+        ret = ret(arg);
+      }
+
+      return ret;
+    };
+
+    /**
+     * printIfFP
+     * @type {function(...[*]): *}
+     * partialRight(when, output) ==> when({{predicate}}, output) ==> fn(predicate)(str);
+     * uncurry(fn(predicate)(str)) ==> fn(predicate, str);
+     */
+    const printIfFP = uncurry(partialRight(when, output));
+
+    printIfFP(isShortEnough, "Hi!"); // Hi!
+    printIfFP(isLongEnough, "Hello World!!!"); // Hello World!!!
   }
 
   return <h2>Chapter 3: Managing Function Inputs</h2>;
