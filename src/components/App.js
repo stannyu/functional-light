@@ -13,7 +13,7 @@ function App() {
   };
   return (
     <>
-      <h1>Hi there</h1>
+      <h1>Functioal light JS by Kyle Simpson</h1>
       <ChapterTwo />
       <ChapterThree />
       <ChapterFour />
